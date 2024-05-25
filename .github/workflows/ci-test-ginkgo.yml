@@ -2,7 +2,7 @@ name: ci-test-ginkgo
 
 on:
   push:
-    branches: [main]
+    branches: [main, lfx-pretask-submission]
     paths:
       - "KubeArmor/**"
       - "tests/**"
@@ -11,7 +11,7 @@ on:
       - "pkg/KubeArmorOperator/**"
       - "deployments/helm/**"
   pull_request:
-    branches: [main]
+    branches: [main, lfx-pretask-submission]
     paths:
       - "KubeArmor/**"
       - "tests/**"
