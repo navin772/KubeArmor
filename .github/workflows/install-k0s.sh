@@ -63,4 +63,6 @@ do
     sleep 1
 done
 
+kubectl patch daemonset kube-router -n kube-system --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/args/5", "value": "--metrics-port=8082"}]'
+sleep 10
 kubectl get pods -A
