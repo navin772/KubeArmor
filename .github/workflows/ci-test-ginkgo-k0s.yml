@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-22.04]
         runtime: ["containerd", "crio"]
     steps:
       - uses: actions/checkout@v3
@@ -79,7 +79,7 @@ jobs:
             fi
             kubectl get pods -A
             helm upgrade --install kubearmor-operator ./deployments/helm/KubeArmorOperator -n kubearmor --create-namespace --set kubearmorOperator.image.tag=latest
-            kubectl get pods -n kubearmor
+            kubectl get pods -A
             kubectl wait --for=condition=ready --timeout=10m -n kubearmor pod -l kubearmor-app=kubearmor-operator || true
             kubectl get pods -A
             kubectl apply -f pkg/KubeArmorOperator/config/samples/kubearmor-test.yaml
