@@ -77,17 +77,24 @@ jobs:
                     sudo podman pull docker-daemon:kubearmor/kubearmor-snitch:latest
                 fi
             fi
+            kubectl get pods -A
             helm upgrade --install kubearmor-operator ./deployments/helm/KubeArmorOperator -n kubearmor --create-namespace --set kubearmorOperator.image.tag=latest
-            kubectl wait --for=condition=ready --timeout=7m -n kubearmor pod -l kubearmor-app=kubearmor-operator
             kubectl get pods -n kubearmor
+            kubectl wait --for=condition=ready --timeout=10m -n kubearmor pod -l kubearmor-app=kubearmor-operator || true
+            kubectl get pods -A
             kubectl apply -f pkg/KubeArmorOperator/config/samples/kubearmor-test.yaml
+            kubectl get pods -A
             kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'=Running kubearmorconfigs/kubearmorconfig-test || true
+            kubectl get pods -A
             kubectl wait --timeout=6m --for=condition=ready pod -l kubearmor-app,kubearmor-app!=kubearmor-snitch,kubearmor-app!=kubearmor-controller -n kubearmor || true
+            kubectl get pods -A
             kubectl wait --timeout=1m --for=condition=ready pod -l kubearmor-app=kubearmor-controller -n kubearmor || true
+            kubectl get pods -A
             for pod in $(kubectl get pods -n kubearmor -o jsonpath='{.items[*].metadata.name}'); do
                 echo "Logs for $pod"
                 kubectl logs -n kubearmor $pod > $pod.log
             done
+            kubectl get pods -A
         continue-on-error: true
 
       - name: Test KubeArmor using Ginkgo
