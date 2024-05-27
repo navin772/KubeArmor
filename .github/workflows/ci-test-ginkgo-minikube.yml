@@ -1,4 +1,4 @@
-name: ci-test-k0s
+name: ci-test-minikube
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-latest]
         runtime: ["containerd", "crio"]
     steps:
       - uses: actions/checkout@v3
@@ -44,7 +44,7 @@ jobs:
       - name: Compile libbpf
         run: ./.github/workflows/install-libbpf.sh
 
-      - name: Setup a k0s Kubernetes environment
+      - name: Setup a minikube Kubernetes environment
         run: ./.github/workflows/install-minikube.sh
 
       - name: Generate KubeArmor artifacts
@@ -95,7 +95,7 @@ jobs:
             kubectl wait --for=condition=ready --timeout=10m -n kubearmor pod -l kubearmor-app=kubearmor-operator || true
             kubectl apply -f pkg/KubeArmorOperator/config/samples/kubearmor-test.yaml
             kubectl get pods -A
-            kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'=Running kubearmorconfigs/kubearmorconfig-test || true
+            # kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'=Running kubearmorconfigs/kubearmorconfig-test || true
             kubectl get pods -A
             kubectl wait --timeout=6m --for=condition=ready pod -l kubearmor-app,kubearmor-app!=kubearmor-snitch,kubearmor-app!=kubearmor-controller -n kubearmor || true
             kubectl wait --timeout=1m --for=condition=ready pod -l kubearmor-app=kubearmor-controller -n kubearmor || true
