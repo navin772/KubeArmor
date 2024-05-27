@@ -45,22 +45,14 @@ sudo chown -R $USER ~/.kube
 sudo chown -R $USER:$USER /var/snap/microk8s/current/credentials
 sudo chmod -R 750 /var/snap/microk8s/current/credentials
 
-# Add the export command to the .bashrc file if it's not already there
-if ! grep -q "export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" ~/.bashrc; then
-    echo "export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> ~/.bashrc
-fi
-
 # Source the .bashrc file to apply the changes
+sudo echo 'export KUBECONFIG=$HOME/.kube/config:/var/snap/microk8s/current/credentials/client.config' >> ~/.bashrc
 source ~/.bashrc
 
-# Alternatively, export KUBECONFIG directly for the current session
-export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
-sleep 30
+sleep 10
 # Test accessing the Kubernetes cluster
 kubectl get po -A
-kubectl apply -f https://raw.githubusercontent.com/kubearmor/KubeArmor/main/tests/k8s_env/ksp/pre-run-pod.yaml
-sleep 30
-kubectl get po -A
+# kubectl apply -f https://raw.githubusercontent.com/kubearmor/KubeArmor/main/tests/k8s_env/ksp/pre-run-pod.yaml
 
 
 # Wait for control plane to initialize

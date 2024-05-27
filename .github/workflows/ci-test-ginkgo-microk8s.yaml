@@ -59,7 +59,6 @@ jobs:
 
       - name: deploy pre existing pod 
         run: |
-          export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
           kubectl apply -f ./tests/k8s_env/ksp/pre-run-pod.yaml
           sleep 60
           kubectl get pods -A
@@ -79,7 +78,6 @@ jobs:
                     sudo podman pull docker-daemon:kubearmor/kubearmor-snitch:latest
                 fi
             fi
-            export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
             helm upgrade --install kubearmor-operator ./deployments/helm/KubeArmorOperator -n kubearmor --create-namespace --set kubearmorOperator.image.tag=latest
             kubectl wait --for=condition=ready --timeout=5m -n kubearmor pod -l kubearmor-app=kubearmor-operator
             kubectl get pods -A
@@ -92,7 +90,6 @@ jobs:
 
       - name: Test KubeArmor using Ginkgo
         run: |
-          export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
           go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
           go mod tidy
           ginkgo --vv --flake-attempts=10 --timeout=10m smoke/
@@ -102,7 +99,6 @@ jobs:
       - name: Get karmor sysdump
         if: ${{ failure() }}
         run: |
-          export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
           kubectl describe pod -n kubearmor -l kubearmor-app=kubearmor
           curl -sfL http://get.kubearmor.io/ | sudo sh -s -- -b /usr/local/bin
           mkdir -p /tmp/kubearmor/ && cd /tmp/kubearmor && karmor sysdump
