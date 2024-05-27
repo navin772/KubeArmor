@@ -29,8 +29,8 @@ sleep 20
 kubectl get po -A
 
 # Wait for control plane to initialize
-echo "waiting for control plane to initialize"
-sleep 20
+# echo "waiting for control plane to initialize"
+# sleep 20
 # K0S_CONFIG="/var/lib/k0s/pki/admin.conf"
 # while [ ! -f $K0S_CONFIG ]; do
 #     echo "waiting for control plane to initialize"
