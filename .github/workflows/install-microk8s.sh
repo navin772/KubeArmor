@@ -31,8 +31,6 @@ sudo ufw default allow routed
 # Wait for MicroK8s to be ready
 sudo microk8s status --wait-ready
 
-cat /var/snap/microk8s/current/credentials/client.config
-
 # Add current user to microk8s group and update permissions
 sudo usermod -a -G microk8s $USER
 newgrp microk8s
@@ -43,6 +41,10 @@ mkdir -p ~/.kube
 # Ensure the .kube directory is owned by the current user
 sudo chown -R $USER ~/.kube
 
+# Fix permissions on MicroK8s credentials
+sudo chown -R $USER:$USER /var/snap/microk8s/current/credentials
+sudo chmod -R 750 /var/snap/microk8s/current/credentials
+
 # Add the export command to the .bashrc file if it's not already there
 if ! grep -q "export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" ~/.bashrc; then
     echo "export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> ~/.bashrc
@@ -50,6 +52,9 @@ fi
 
 # Source the .bashrc file to apply the changes
 source ~/.bashrc
+
+# Alternatively, export KUBECONFIG directly for the current session
+export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
 
 # Test accessing the Kubernetes cluster
 kubectl get po -A
