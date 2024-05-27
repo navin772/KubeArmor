@@ -47,6 +47,10 @@ jobs:
 
       - name: Setup a microk8s Kubernetes environment
         run: ./.github/workflows/install-microk8s.sh
+    
+      - name: Set KUBECONFIG environment variable
+        run: echo "KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> $GITHUB_ENV
+
 
       - name: Generate KubeArmor artifacts
         run: |
