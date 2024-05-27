@@ -1,4 +1,4 @@
-name: ci-test-k0s
+name: ci-test-microk8s
 
 on:
   push:
@@ -45,7 +45,7 @@ jobs:
       - name: Compile libbpf
         run: ./.github/workflows/install-libbpf.sh
 
-      - name: Setup a k0s Kubernetes environment
+      - name: Setup a microk8s Kubernetes environment
         run: ./.github/workflows/install-microk8s.sh
 
       - name: Generate KubeArmor artifacts
@@ -67,10 +67,10 @@ jobs:
       - name: Run KubeArmor
         run: |
             if [ ${{ matrix.runtime }} == "containerd" ]; then
-                docker save kubearmor/kubearmor-init:latest | sudo k0s ctr images import -
-                docker save kubearmor/kubearmor:latest | sudo k0s ctr images import -
-                docker save kubearmor/kubearmor-operator:latest | sudo k0s ctr images import -
-                docker save kubearmor/kubearmor-snitch:latest | sudo k0s ctr images import -
+                docker save kubearmor/kubearmor-init:latest | sudo microk8s ctr images import -
+                docker save kubearmor/kubearmor:latest | sudo microk8s ctr images import -
+                docker save kubearmor/kubearmor-operator:latest | sudo microk8s ctr images import -
+                docker save kubearmor/kubearmor-snitch:latest | sudo microk8s ctr images import -
             else
                 if [ ${{ matrix.runtime }} == "crio" ]; then
                     sudo podman pull docker-daemon:kubearmor/kubearmor-init:latest
@@ -102,6 +102,7 @@ jobs:
       - name: Get karmor sysdump
         if: ${{ failure() }}
         run: |
+          export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
           kubectl describe pod -n kubearmor -l kubearmor-app=kubearmor
           curl -sfL http://get.kubearmor.io/ | sudo sh -s -- -b /usr/local/bin
           mkdir -p /tmp/kubearmor/ && cd /tmp/kubearmor && karmor sysdump
