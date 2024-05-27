@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: ["ubuntu-24.04"]
         runtime: ["containerd", "crio"]
     steps:
       - uses: actions/checkout@v3
@@ -92,7 +92,7 @@ jobs:
                 fi
             fi
             kubectl get pods -A
-            curl -sfL http://get.kubearmor.io/ 
+            curl -sfL http://get.kubearmor.io/ | sh -s
             sudo mv ./bin/karmor /usr/local/bin/
             karmor install
             sleep 20
