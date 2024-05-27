@@ -55,8 +55,11 @@ source ~/.bashrc
 
 # Alternatively, export KUBECONFIG directly for the current session
 export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config
-
+sleep 30
 # Test accessing the Kubernetes cluster
+kubectl get po -A
+kubectl apply -f https://raw.githubusercontent.com/kubearmor/KubeArmor/main/tests/k8s_env/ksp/pre-run-pod.yaml
+sleep 30
 kubectl get po -A
 
 
