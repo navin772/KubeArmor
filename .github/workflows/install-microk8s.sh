@@ -21,22 +21,37 @@ if [ "$RUNTIME" == "" ]; then
     fi
 fi
 
-# Install microk8s
+# Install MicroK8s
 sudo snap install microk8s --classic
+
+# Configure UFW
 sudo ufw allow in on cni0 && sudo ufw allow out on cni0
 sudo ufw default allow routed
-sleep 60
 
+# Wait for MicroK8s to be ready
+sudo microk8s status --wait-ready
+
+cat /var/snap/microk8s/current/credentials/client.config
+
+# Add current user to microk8s group and update permissions
 sudo usermod -a -G microk8s $USER
 newgrp microk8s
+
+# Create the .kube directory if it doesn't exist
+mkdir -p ~/.kube
+
+# Ensure the .kube directory is owned by the current user
 sudo chown -R $USER ~/.kube
-# Add the export command to the .bashrc file
-echo "export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> ~/.bashrc
+
+# Add the export command to the .bashrc file if it's not already there
+if ! grep -q "export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" ~/.bashrc; then
+    echo "export KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> ~/.bashrc
+fi
 
 # Source the .bashrc file to apply the changes
 source ~/.bashrc
 
-# Get the list of pods in all namespaces
+# Test accessing the Kubernetes cluster
 kubectl get po -A
 
 

@@ -10,6 +10,7 @@ on:
       - ".github/workflows/ci-test-ginkgo-microk8s.yaml"
       - "pkg/KubeArmorOperator/**"
       - "deployments/helm/**"
+      - ".github/workflows/install-microk8s.sh"
   release:
     types: [published]
   schedule:
