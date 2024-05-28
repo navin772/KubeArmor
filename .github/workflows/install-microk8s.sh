@@ -50,6 +50,7 @@ export KUBECONFIG=$HOME/.kube/config:/var/snap/microk8s/current/credentials/clie
 sleep 30
 # Test accessing the Kubernetes cluster
 kubectl get po -A
+kubectl get no -o wide
 
 
 # Wait for control plane to initialize
@@ -91,3 +92,4 @@ done
 # kubectl patch daemonset kube-router -n kube-system --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/args/5", "value": "--metrics-port=8082"}]'
 # sleep 10
 kubectl get pods -A
+kubectl get no -o wide
