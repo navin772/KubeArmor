@@ -69,7 +69,7 @@ jobs:
 
       - name: Run KubeArmor
         run: |
-            if [ ${{ matrix.runtime }} == "containerd" ]; then
+            if [ ${{ matrix.runtime }} == "containerd" ] || [ ${{ matrix.runtime }} == "docker" ]; then
                 docker save kubearmor/kubearmor-init:latest | sudo microk8s ctr images import -
                 docker save kubearmor/kubearmor:latest | sudo microk8s ctr images import -
                 docker save kubearmor/kubearmor-operator:latest | sudo microk8s ctr images import -
