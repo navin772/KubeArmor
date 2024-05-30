@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-24.04"]
+        os: ["ubuntu-latest"]
         runtime: ["containerd", "crio"]
     steps:
       - uses: actions/checkout@v3
@@ -46,9 +46,18 @@ jobs:
             cat /etc/default/grub
             ./.github/workflows/install-libbpf.sh
 
-      - name: Setup a minikube Kubernetes environment
-        run: ./.github/workflows/install-minikube.sh
+      # - name: Setup a minikube Kubernetes environment
+      #   run: ./.github/workflows/install-minikube.sh
+      - name: Setup virtualbox
+        run: sudo apt install -y virtualbox
 
+      - name: Start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@latest
+        with:
+          driver: virtualbox
+          container-runtime: ${{ matrix.runtime }}
+          
       - name: Generate KubeArmor artifacts
         run: |
           GITHUB_SHA=$GITHUB_SHA ./KubeArmor/build/build_kubearmor.sh
@@ -91,13 +100,15 @@ jobs:
                     sudo podman pull docker-daemon:kubearmor/kubearmor-snitch:latest
                 fi
             fi
-            kubectl get pods -A
-            curl -sfL http://get.kubearmor.io/ | sh -s
-            sudo mv ./bin/karmor /usr/local/bin/
-            karmor install
-            sleep 20
+            helm upgrade --install kubearmor-operator ./deployments/helm/KubeArmorOperator -n kubearmor --create-namespace --set kubearmorOperator.image.tag=latest
             kubectl wait --for=condition=ready --timeout=5m -n kubearmor pod -l kubearmor-app=kubearmor-operator
-        # continue-on-error: true
+            kubectl get pods -A
+            kubectl apply -f pkg/KubeArmorOperator/config/samples/kubearmor-test.yaml
+            kubectl wait -n kubearmor --timeout=5m --for=jsonpath='{.status.phase}'=Running kubearmorconfigs/kubearmorconfig-test
+            kubectl wait --timeout=7m --for=condition=ready pod -l kubearmor-app,kubearmor-app!=kubearmor-snitch,kubearmor-app!=kubearmor-controller -n kubearmor
+            kubectl wait --timeout=1m --for=condition=ready pod -l kubearmor-app=kubearmor-controller -n kubearmor
+            kubectl get pods -A
+          # continue-on-error: true
 
       - name: Test KubeArmor using Ginkgo
         run: |
