@@ -2,7 +2,7 @@ name: ci-test-microk8s
 
 on:
   push:
-    branches: [k0s-tests]
+    branches: [k0s-tests, main]
     paths:
       - "KubeArmor/**"
       - "tests/**"
@@ -13,8 +13,6 @@ on:
       - ".github/workflows/install-microk8s.sh"
   release:
     types: [published]
-  schedule:
-    - cron: '0 0 * * 0' # Weekly on Sunday at midnight
 
 # Declare default permissions as read only.
 permissions: read-all
@@ -29,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-20.04, ubuntu-latest]
-        runtime: ["containerd", "crio", "docker"]
+        runtime: ["containerd"]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -45,8 +43,18 @@ jobs:
       - name: Compile libbpf
         run: ./.github/workflows/install-libbpf.sh
 
-      - name: Setup a microk8s Kubernetes environment
-        run: ./.github/workflows/install-microk8s.sh
+      # - name: Setup a microk8s Kubernetes environment
+      #   run: ./.github/workflows/install-microk8s.sh
+
+      - uses: balchua/microk8s-actions@v0.3.2
+        with:
+          channel: '1.28/stable'
+      - name: Test MicroK8s
+        id: microk8s
+        run: |
+          kubectl get no -o wide
+          kubectl get pods -A -o wide
+    
     
       - name: Set KUBECONFIG environment variable
         run: echo "KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> $GITHUB_ENV
@@ -69,19 +77,11 @@ jobs:
 
       - name: Run KubeArmor
         run: |
-            if [ ${{ matrix.runtime }} == "containerd" ] || [ ${{ matrix.runtime }} == "docker" ]; then
-                docker save kubearmor/kubearmor-init:latest | sudo microk8s ctr images import -
-                docker save kubearmor/kubearmor:latest | sudo microk8s ctr images import -
-                docker save kubearmor/kubearmor-operator:latest | sudo microk8s ctr images import -
-                docker save kubearmor/kubearmor-snitch:latest | sudo microk8s ctr images import -
-            else
-                if [ ${{ matrix.runtime }} == "crio" ]; then
-                    sudo podman pull docker-daemon:kubearmor/kubearmor-init:latest
-                    sudo podman pull docker-daemon:kubearmor/kubearmor:latest
-                    sudo podman pull docker-daemon:kubearmor/kubearmor-operator:latest
-                    sudo podman pull docker-daemon:kubearmor/kubearmor-snitch:latest
-                fi
-            fi
+            docker save kubearmor/kubearmor-init:latest | sudo microk8s ctr images import -
+            docker save kubearmor/kubearmor:latest | sudo microk8s ctr images import -
+            docker save kubearmor/kubearmor-operator:latest | sudo microk8s ctr images import -
+            docker save kubearmor/kubearmor-snitch:latest | sudo microk8s ctr images import -
+            
             helm upgrade --install kubearmor-operator ./deployments/helm/KubeArmorOperator -n kubearmor --create-namespace --set kubearmorOperator.image.tag=latest
             kubectl wait --for=condition=ready --timeout=5m -n kubearmor pod -l kubearmor-app=kubearmor-operator
             kubectl get pods -A
