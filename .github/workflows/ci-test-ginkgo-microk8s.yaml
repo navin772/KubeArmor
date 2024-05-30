@@ -55,9 +55,13 @@ jobs:
           kubectl get no -o wide
           kubectl get pods -A -o wide
     
-    
-      - name: Set KUBECONFIG environment variable
-        run: echo "KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> $GITHUB_ENV
+      - name: deploy pre existing pod 
+        run: |
+            kubectl apply -f ./tests/k8s_env/ksp/pre-run-pod.yaml
+            sleep 60
+            kubectl get pods -A
+      # - name: Set KUBECONFIG environment variable
+      #   run: echo "KUBECONFIG=/var/snap/microk8s/current/credentials/client.config" >> $GITHUB_ENV
 
 
       - name: Generate KubeArmor artifacts
@@ -69,11 +73,11 @@ jobs:
         run: |
           make docker-build
 
-      - name: deploy pre existing pod 
-        run: |
-          kubectl apply -f ./tests/k8s_env/ksp/pre-run-pod.yaml
-          sleep 60
-          kubectl get pods -A
+      # - name: deploy pre existing pod 
+      #   run: |
+      #     kubectl apply -f ./tests/k8s_env/ksp/pre-run-pod.yaml
+      #     sleep 60
+      #     kubectl get pods -A
 
       - name: Run KubeArmor
         run: |
