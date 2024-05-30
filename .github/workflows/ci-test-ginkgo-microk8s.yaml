@@ -43,12 +43,10 @@ jobs:
       - name: Compile libbpf
         run: ./.github/workflows/install-libbpf.sh
 
-      # - name: Setup a microk8s Kubernetes environment
-      #   run: ./.github/workflows/install-microk8s.sh
-
       - uses: balchua/microk8s-actions@v0.3.2
         with:
-          channel: '1.28/stable'
+          channel: 'latest/stable'
+
       - name: Test MicroK8s
         id: microk8s
         run: |
@@ -94,7 +92,6 @@ jobs:
             kubectl wait --timeout=7m --for=condition=ready pod -l kubearmor-app,kubearmor-app!=kubearmor-snitch,kubearmor-app!=kubearmor-controller -n kubearmor
             kubectl wait --timeout=1m --for=condition=ready pod -l kubearmor-app=kubearmor-controller -n kubearmor
             kubectl get pods -A
-        # continue-on-error: true
 
       - name: Test KubeArmor using Ginkgo
         run: |
