@@ -12,8 +12,6 @@ on:
       - "deployments/helm/**"
   release:
     types: [published]
-  schedule:
-    - cron: '0 0 * * 0' # Weekly on Sunday at midnight
 
 # Declare default permissions as read only.
 permissions: read-all
@@ -57,6 +55,19 @@ jobs:
         with:
           driver: virtualbox
           container-runtime: ${{ matrix.runtime }}
+
+      - name: Verify minikube
+        run: |
+          minikube status
+          minikube kubectl get nodes -o wide
+          kubectl get pods -A
+          kubectl get nodes -o wide
+          
+      - name: deploy pre existing pod 
+        run: |
+          kubectl apply -f ./tests/k8s_env/ksp/pre-run-pod.yaml
+          sleep 20
+          kubectl get no -o wide
           
       - name: Generate KubeArmor artifacts
         run: |
@@ -67,13 +78,11 @@ jobs:
         run: |
           make docker-build
 
-      - name: deploy pre existing pod 
-        run: |
-          cat /etc/default/grub
-          kubectl apply -f ./tests/k8s_env/ksp/pre-run-pod.yaml
-          sleep 60
-          kubectl get pods -A
-          kubectl get no -o wide
+      # - name: deploy pre existing pod 
+      #   run: |
+      #     kubectl apply -f ./tests/k8s_env/ksp/pre-run-pod.yaml
+      #     sleep 20
+      #     kubectl get no -o wide
 
       - name: Run KubeArmor
         run: |
@@ -82,16 +91,6 @@ jobs:
                 docker save -o kubearmor-latest.tar kubearmor/kubearmor:latest | minikube image load -
                 docker save -o kubearmor-operator-latest.tar kubearmor/kubearmor-operator:latest | minikube image load -
                 docker save -o kubearmor-snitch-latest.tar kubearmor/kubearmor-snitch:latest | minikube image load -
-
-                # minikube image load kubearmor-init-latest.tar
-                # minikube image load kubearmor-latest.tar
-                # minikube image load kubearmor-operator-latest.tar
-                # minikube image load kubearmor-snitch-latest.tar
-
-                # rm kubearmor-init-latest.tar
-                # rm kubearmor-latest.tar
-                # rm kubearmor-operator-latest.tar
-                # rm kubearmor-snitch-latest.tar
             
             else
                 if [ ${{ matrix.runtime }} == "crio" ]; then
