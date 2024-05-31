@@ -49,7 +49,7 @@ jobs:
       - name: Compile libbpf
         run: ./.github/workflows/install-libbpf.sh
 
-      - uses: balchua/microk8s-actions@v0.3.2
+      - uses: balchua/microk8s-actions@v0.4.2
         with:
           channel: 'latest/stable'
 
@@ -58,6 +58,12 @@ jobs:
         run: |
           kubectl get no -o wide
           kubectl get pods -A -o wide
+
+      - name: deploy pre existing pod 
+        run: |
+            kubectl apply -f ./tests/k8s_env/ksp/pre-run-pod.yaml
+            kubectl wait --timeout=2m --for=condition=ready pod --all -n nginx
+            kubectl get pods -A
 
       - name: Generate KubeArmor artifacts
         run: |
@@ -68,10 +74,11 @@ jobs:
         run: |
           make docker-build
 
-      - name: deploy pre existing pod 
-        run: |
-            kubectl wait --timeout=2m --for=condition=ready pod -l app=nginx
-            kubectl get pods -A
+      # - name: deploy pre existing pod 
+      #   run: |
+      #       kubectl apply -f ./tests/k8s_env/ksp/pre-run-pod.yaml
+      #       kubectl wait --timeout=2m --for=condition=ready pod --all -n nginx
+      #       kubectl get pods -A
 
       - name: Run KubeArmor
         run: |
