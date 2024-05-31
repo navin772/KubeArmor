@@ -59,7 +59,6 @@ jobs:
       - name: Verify minikube
         run: |
           minikube status
-          minikube kubectl get nodes -o wide
           kubectl get pods -A
           kubectl get nodes -o wide
           
@@ -68,7 +67,7 @@ jobs:
           kubectl apply -f ./tests/k8s_env/ksp/pre-run-pod.yaml
           sleep 20
           kubectl get no -o wide
-          
+
       - name: Generate KubeArmor artifacts
         run: |
           GITHUB_SHA=$GITHUB_SHA ./KubeArmor/build/build_kubearmor.sh
