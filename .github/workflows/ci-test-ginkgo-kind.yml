@@ -57,7 +57,7 @@ jobs:
           kubectl get no -o wide
           kubectl get pods -A -o wide
           kind get clusters
-          kind get nodes
+          kind get nodes --name chart-testing
 
       - name: deploy pre existing pod 
         run: |
@@ -88,12 +88,12 @@ jobs:
             docker save -o kubearmor-operator.tar kubearmor/kubearmor-operator:latest
             docker save -o kubearmor-snitch.tar kubearmor/kubearmor-snitch:latest
 
-            docker exec -it chart-testing-control-plane crictl images
+            docker exec chart-testing-control-plane crictl images
 
-            sudo kind load image-archive --name chart-testing-control-plane --nodes chart-testing-control-plane kubearmor-init.tar
-            sudo kind load image-archive --name chart-testing-control-plane --nodes chart-testing-control-plane kubearmor.tar
-            sudo kind load image-archive --name chart-testing-control-plane --nodes chart-testing-control-plane kubearmor-operator.tar
-            sudo kind load image-archive --name chart-testing-control-plane --nodes chart-testing-control-plane kubearmor-snitch.tar
+            sudo kind load image-archive --name chart-testing --nodes chart-testing-control-plane kubearmor-init.tar
+            sudo kind load image-archive --name chart-testing --nodes chart-testing-control-plane kubearmor.tar
+            sudo kind load image-archive --name chart-testing --nodes chart-testing-control-plane kubearmor-operator.tar
+            sudo kind load image-archive --name chart-testing --nodes chart-testing-control-plane kubearmor-snitch.tar
 
             docker ps -a
             docker exec -it chart-testing-control-plane crictl images
