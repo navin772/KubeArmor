@@ -47,7 +47,7 @@ jobs:
       # - name: Setup a minikube Kubernetes environment
       #   run: ./.github/workflows/install-minikube.sh
       - name: Setup virtualbox
-        run: sudo apt install -y virtualbox
+        run: sudo apt install -y virtualbox apparmor apparmor-utils
 
       - name: Start minikube
         id: minikube

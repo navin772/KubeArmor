@@ -54,6 +54,7 @@ jobs:
 
       - name: Test kind
         run: |
+          sudo apt install -y apparmor apparmor-utils
           kubectl get no -o wide
           kubectl get pods -A -o wide
           kind get clusters
