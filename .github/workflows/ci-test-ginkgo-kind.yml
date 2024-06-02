@@ -82,7 +82,6 @@ jobs:
 
       - name: Run KubeArmor
         run: |
-            docker ps -a
             docker save -o kubearmor-init.tar kubearmor/kubearmor-init:latest
             docker save -o kubearmor.tar kubearmor/kubearmor:latest
             docker save -o kubearmor-operator.tar kubearmor/kubearmor-operator:latest
@@ -95,8 +94,7 @@ jobs:
             sudo kind load image-archive --name chart-testing --nodes chart-testing-control-plane kubearmor-operator.tar
             sudo kind load image-archive --name chart-testing --nodes chart-testing-control-plane kubearmor-snitch.tar
 
-            docker ps -a
-            docker exec -it chart-testing-control-plane crictl images
+            docker exec chart-testing-control-plane crictl images
 
             helm upgrade --install kubearmor-operator ./deployments/helm/KubeArmorOperator -n kubearmor --create-namespace --set kubearmorOperator.image.tag=latest
             kubectl wait --for=condition=ready --timeout=5m -n kubearmor pod -l kubearmor-app=kubearmor-operator
