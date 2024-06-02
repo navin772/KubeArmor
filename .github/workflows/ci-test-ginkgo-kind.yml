@@ -81,11 +81,18 @@ jobs:
       - name: Run KubeArmor
         run: |
             docker ps -a
-            docker save kubearmor/kubearmor-init:latest | sudo kind load image-archive -
-            docker save kubearmor/kubearmor:latest | sudo kind load image-archive -
-            docker save kubearmor/kubearmor-operator:latest | sudo kind load image-archive -
-            docker save kubearmor/kubearmor-snitch:latest | sudo kind load image-archive -
-            
+            docker save -o kubearmor-init.tar kubearmor/kubearmor-init:latest
+            docker save -o kubearmor.tar kubearmor/kubearmor:latest
+            docker save -o kubearmor-operator.tar kubearmor/kubearmor-operator:latest
+            docker save -o kubearmor-snitch.tar kubearmor/kubearmor-snitch:latest
+
+            sudo kind load image-archive kubearmor-init.tar
+            sudo kind load image-archive kubearmor.tar
+            sudo kind load image-archive kubearmor-operator.tar
+            sudo kind load image-archive kubearmor-snitch.tar
+
+            docker ps -a
+
             helm upgrade --install kubearmor-operator ./deployments/helm/KubeArmorOperator -n kubearmor --create-namespace --set kubearmorOperator.image.tag=latest
             kubectl wait --for=condition=ready --timeout=5m -n kubearmor pod -l kubearmor-app=kubearmor-operator
             kubectl get pods -A
