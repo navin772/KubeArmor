@@ -56,6 +56,8 @@ jobs:
         run: |
           kubectl get no -o wide
           kubectl get pods -A -o wide
+          kind get clusters
+          kind get nodes
 
       - name: deploy pre existing pod 
         run: |
@@ -86,12 +88,15 @@ jobs:
             docker save -o kubearmor-operator.tar kubearmor/kubearmor-operator:latest
             docker save -o kubearmor-snitch.tar kubearmor/kubearmor-snitch:latest
 
-            sudo kind load image-archive kubearmor-init.tar
-            sudo kind load image-archive kubearmor.tar
-            sudo kind load image-archive kubearmor-operator.tar
-            sudo kind load image-archive kubearmor-snitch.tar
+            docker exec -it chart-testing-control-plane crictl images
+
+            sudo kind load image-archive --name chart-testing-control-plane --nodes chart-testing-control-plane kubearmor-init.tar
+            sudo kind load image-archive --name chart-testing-control-plane --nodes chart-testing-control-plane kubearmor.tar
+            sudo kind load image-archive --name chart-testing-control-plane --nodes chart-testing-control-plane kubearmor-operator.tar
+            sudo kind load image-archive --name chart-testing-control-plane --nodes chart-testing-control-plane kubearmor-snitch.tar
 
             docker ps -a
+            docker exec -it chart-testing-control-plane crictl images
 
             helm upgrade --install kubearmor-operator ./deployments/helm/KubeArmorOperator -n kubearmor --create-namespace --set kubearmorOperator.image.tag=latest
             kubectl wait --for=condition=ready --timeout=5m -n kubearmor pod -l kubearmor-app=kubearmor-operator
