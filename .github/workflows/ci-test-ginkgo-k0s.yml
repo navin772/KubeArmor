@@ -8,6 +8,7 @@ on:
       - "tests/**"
       - "protobuf/**"
       - ".github/workflows/ci-test-ginkgo-k0s.yml"
+      - ".github/workflows/install-k0s.sh"
       - "pkg/KubeArmorOperator/**"
       - "deployments/helm/**"
   release:
@@ -46,6 +47,9 @@ jobs:
 
       - name: Setup a k0s Kubernetes environment
         run: ./.github/workflows/install-k0s.sh
+
+      - name: Test kubectl
+        run: kubectl get no -o wide
 
       - name: Generate KubeArmor artifacts
         run: |
@@ -120,18 +124,4 @@ jobs:
           path: |
             /tmp/kubearmor/
             /tmp/kubearmor.*
-
-      - name: Measure code coverage
-        if: ${{ always() }}
-        run: |
-          go install github.com/modocache/gover@latest
-          gover
-          go tool cover -func=gover.coverprofile
-        working-directory: KubeArmor
-        env:
-          GOPATH: /home/runner/go
-
-      - uses: codecov/codecov-action@v3
-        if: ${{ always() }}
-        with:
-          files: ./KubeArmor/gover.coverprofile
+            
