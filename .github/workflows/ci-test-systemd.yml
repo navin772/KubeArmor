@@ -49,11 +49,15 @@ jobs:
         working-directory: KubeArmor
 
       - name: Install KubeArmor
-        run: sudo apt install -y ./dist/kubearmor*amd64.deb
+        run: sudo apt-get install -y ./dist/kubearmor*amd64.deb
         working-directory: KubeArmor
 
       - name: Check journalctl
-        run: sudo journalctl -u kubearmor --no-pager
+        run: |
+          sleep 10
+          sudo journalctl -u kubearmor --no-pager
+          sleep 7
+          sudo journalctl -u kubearmor --no-pager
       
       - name: Test kubearmor using ginkgo 
         run: |
