@@ -2,7 +2,7 @@ name: ci-coverage
 
 on:
   push:
-    branches: [main]
+    branches: [main, non-k8s-hsp-test]
     paths:
       - "KubeArmor/**"
       - ".github/workflows/ci-coverage.yaml"
