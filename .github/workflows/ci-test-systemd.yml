@@ -9,7 +9,7 @@ on:
       - "protobuf/**"
       - ".github/workflows/ci-test-systemd.yml"
   pull_request:
-    branches: [main, lfx-pretask]
+    branches: [main]
     paths:
       - "KubeArmor/**"
       - "tests/**"
