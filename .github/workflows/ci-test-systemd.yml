@@ -2,7 +2,7 @@ name: ci-test-systemd
 
 on:
   push:
-    branches: [main]
+    branches: [main, non-k8s-hsp-test]
     paths:
       - "KubeArmor/**"
       - "tests/**"
