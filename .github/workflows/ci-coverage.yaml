@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-20.04, bpflsm]
         runtime: ["containerd", "crio"]
     steps:
       - uses: actions/checkout@v3
@@ -182,7 +182,7 @@ jobs:
           # gover
         working-directory: KubeArmor
         env:
-          GOPATH: /home/runner/go
+          GOPATH: ${{ matrix.os == 'bpflsm' && '/home/vagrant/go' || '/home/runner/go' }}
 
       - name: Upload coverage file
         if: ${{ always() }}
@@ -280,7 +280,7 @@ jobs:
           go tool cover -func coverage_docker_${{ matrix.os }}.out
         working-directory: KubeArmor
         env:
-          GOPATH: /home/runner/go
+          GOPATH: ${{ matrix.os == 'bpflsm' && '/home/vagrant/go' || '/home/runner/go' }}
 
       - name: Save coverage file
         if: ${{ always() }}
@@ -372,7 +372,7 @@ jobs:
           go tool cover -func coverage_systemd_${{ matrix.os }}.out
         working-directory: KubeArmor
         env:
-          GOPATH: /home/runner/go
+          GOPATH: ${{ matrix.os == 'bpflsm' && '/home/vagrant/go' || '/home/runner/go' }}
 
       - name: Save coverage file
         if: ${{ always() }}
