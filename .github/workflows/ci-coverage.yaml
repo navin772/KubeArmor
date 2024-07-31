@@ -191,6 +191,9 @@ jobs:
           name: coverage-k8s-${{ matrix.os }}-${{ matrix.runtime }}
           path: KubeArmor/coverage_k8s_${{ matrix.os }}_${{ matrix.runtime }}.out
 
+      - name: Run cleanup
+        if: ${{ always() && matrix.os == 'bpflsm' }}
+        run: ./.github/workflows/cleanup.sh
 
   docker-compose-coverage:
     name: Calculate coverage in docker mode / ${{ matrix.os }}
@@ -289,6 +292,10 @@ jobs:
           name: coverage-docker-${{ matrix.os }}
           path: KubeArmor/coverage_docker_${{ matrix.os }}.out
 
+      - name: Run cleanup
+        if: ${{ always() && matrix.os == 'bpflsm' }}
+        run: ./.github/workflows/cleanup.sh
+
 
   calculate-systemd-coverage:
     name: Calculate coverage in systemd mode / ${{ matrix.os }}
@@ -380,6 +387,13 @@ jobs:
         with:
           name: coverage-systemd-${{ matrix.os }}
           path: KubeArmor/coverage_systemd_${{ matrix.os }}.out
+
+      - name: Run cleanup
+        if: ${{ always() && matrix.os == 'bpflsm' }}
+        run: |
+          sudo systemctl stop kubearmor
+          sudo systemctl disable kubearmor
+          sudo apt remove -y kubearmor
 
 
   merge-and-upload-coverage:
