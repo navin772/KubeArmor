@@ -2,7 +2,9 @@ name: ci-merge-coverage
 
 on:
   workflow_run:
-    workflows: ["ci-test-ginkgo"]
+    workflows: [ci-test-ginkgo]
+    branches:
+      - "*"
     types:
       - completed
 
@@ -34,7 +36,7 @@ jobs:
             all_completed=true
 
             for workflow in "${workflows[@]}"; do
-                conclusion=$(gh run list --workflow=$workflow --branch=main --json conclusion,headSha | jq -r --arg sha "$commit_sha" '.[] | select(.headSha == $sha) | .conclusion')
+              conclusion=$(gh run list --workflow=$workflow --json conclusion,headSha | jq -r --arg sha "$commit_sha" '.[] | select(.headSha == $sha) | .conclusion')
 
                 if [[ -z "$conclusion" ]]; then
                 conclusion="pending"
