@@ -2,7 +2,7 @@ name: ci-test-ginkgo
 
 on:
   push:
-    branches: [main]
+    branches: [main, fix-coverage-crio]
     paths:
       - "KubeArmor/**"
       - "tests/**"
@@ -121,12 +121,14 @@ jobs:
             kubectl apply -f pkg/KubeArmorOperator/config/samples/kubearmor-coverage.yaml
           fi
 
-          kubectl wait -n kubearmor --timeout=5m --for=jsonpath='{.status.phase}'=Running kubearmorconfigs/kubearmorconfig-test
-          kubectl wait --timeout=7m --for=condition=ready pod -l kubearmor-app,kubearmor-app!=kubearmor-snitch,kubearmor-app!=kubearmor-controller -n kubearmor
-          kubectl wait --timeout=1m --for=condition=ready pod -l kubearmor-app=kubearmor-controller -n kubearmor
           kubectl get pods -A
 
-          sleep 10
+          # kubectl wait -n kubearmor --timeout=5m --for=jsonpath='{.status.phase}'=Running kubearmorconfigs/kubearmorconfig-test
+          # kubectl wait --timeout=7m --for=condition=ready pod -l kubearmor-app,kubearmor-app!=kubearmor-snitch,kubearmor-app!=kubearmor-controller -n kubearmor
+          # kubectl wait --timeout=1m --for=condition=ready pod -l kubearmor-app=kubearmor-controller -n kubearmor
+          sleep 60
+          kubectl get pods -A
+
           DAEMONSET_NAME=$(kubectl get daemonset -n kubearmor -o jsonpath='{.items[0].metadata.name}')
           echo "DaemonSet: $DAEMONSET_NAME"
 
