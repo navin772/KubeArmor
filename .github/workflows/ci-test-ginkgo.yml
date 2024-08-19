@@ -95,9 +95,9 @@ jobs:
           else
             if [ ${{ matrix.runtime }} == "crio" ]; then
               docker save kubearmor/kubearmor-test-init:latest | sudo podman load
-              sudo podman tag localhost/latest:latest docker.io/kubearmor/kubearmor-init:latest
+              sudo podman tag localhost/latest:latest docker.io/kubearmor/kubearmor-test-init:latest
               docker save kubearmor/kubearmor-test:latest | sudo podman load
-              sudo podman tag localhost/latest:latest docker.io/kubearmor/kubearmor:latest
+              sudo podman tag localhost/latest:latest docker.io/kubearmor/kubearmor-test:latest
               docker save kubearmor/kubearmor-operator:latest | sudo podman load
               sudo podman tag localhost/latest:latest docker.io/kubearmor/kubearmor-operator:latest
               docker save kubearmor/kubearmor-snitch:latest | sudo podman load
