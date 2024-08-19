@@ -2,7 +2,7 @@ name: ci-test-ginkgo
 
 on:
   push:
-    branches: [main, fix-coverage-crio]
+    branches: [main, fix-coverage-crio ]
     paths:
       - "KubeArmor/**"
       - "tests/**"
