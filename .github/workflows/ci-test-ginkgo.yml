@@ -160,6 +160,8 @@ jobs:
           ]'
 
           sleep 15
+          df -h
+          free -h
 
       - name: Get KubeArmor POD info
         run: |
@@ -171,13 +173,10 @@ jobs:
 
       - name: Test KubeArmor using Ginkgo
         run: |
-          kubectl logs $POD_NAME -n kubearmor
           go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
           make
         working-directory: ./tests/k8s_env
         timeout-minutes: 30
-        env:
-          POD_NAME: ${{ env.POD_NAME }}
 
       - name: Kill KubeArmor prcoess in the pod
         run: |
