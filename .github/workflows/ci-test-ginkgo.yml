@@ -11,7 +11,7 @@ on:
       - "pkg/KubeArmorOperator/**"
       - "deployments/helm/**"
   pull_request:
-    branches: [main]
+    branches: [main, fix-coverage-crio]
     paths:
       - "KubeArmor/**"
       - "tests/**"
