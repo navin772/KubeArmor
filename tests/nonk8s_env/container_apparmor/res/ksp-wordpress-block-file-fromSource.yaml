@@ -1,0 +1,20 @@
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: ksp-wordpress-block-file-fromSource
+spec:
+  severity: 10
+  selector:
+    matchLabels:
+      kubearmor.io/container.name: wordpress-mysql
+  file:
+    matchPaths:
+    - path: /var/www/html/wp-config.php
+      fromSource:
+      - path: /usr/bin/cat
+      - path: /bin/cat
+
+      # cat /var/www/html/wp-config.php
+ 
+  action:
+    Block
