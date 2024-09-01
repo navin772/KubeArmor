@@ -1,0 +1,18 @@
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: ksp-wordpress-block-network
+spec:
+  severity: 8
+  selector:
+    matchLabels:
+      kubearmor.io/container.name: wordpress-mysql
+  network:
+    matchProtocols:
+    - protocol: udp
+      fromSource:
+      - path: /usr/bin/curl
+      - path: /usr/bin/bash
+
+  action:
+    Block

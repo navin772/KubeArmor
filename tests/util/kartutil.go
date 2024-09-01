@@ -656,7 +656,7 @@ func K8sRuntime() string {
 func RunDockerCommand(cmdstr string) (string, error) {
 	cmdf := strings.Fields(cmdstr)
 	cmd := exec.Command("docker", cmdf...)
-	sout, err := cmd.Output()
+	sout, err := cmd.CombinedOutput()
 	return string(sout), err
 }
 
